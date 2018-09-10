@@ -29,6 +29,27 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
+  
+  num_train = X.shape[0]
+
+  for i in range(num_train):
+
+    score = X[i].dot(W)
+    score -= np.max(score)
+    loss += - np.log(np.exp(score[y[i]]) / np.sum(np.exp(score)))
+
+    for  j in range(W.shape[1]):
+      if j == y[i]:
+        dW[:, j] += (np.exp(score[j]) / np.sum(np.exp(score)) - 1) * X[i]
+      else:
+        dW[:, j] += np.exp(score[j]) / np.sum(np.exp(score)) * X[i]
+
+  loss /= num_train
+  loss += reg * np.sum(W * W)
+
+  dW /= num_train
+  dW += reg*W 
+  
   pass
   #############################################################################
   #                          END OF YOUR CODE                                 #
@@ -46,6 +67,7 @@ def softmax_loss_vectorized(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
+  num_train = X.shape[0]
 
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using no explicit loops.  #
@@ -53,6 +75,19 @@ def softmax_loss_vectorized(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
+  
+  score = X.dot(W)
+  score = np.exp(score - score.max())
+  loss = np.sum(- np.log(score[np.arange(len(score)), y] / np.sum(score, axis = 1)))
+  loss /= num_train
+  loss += reg * np.sum(W * W)
+
+  m_s = score/score.sum(axis=1, keepdims=True)
+  m_s[np.arange(len(score)), y] -= 1
+  dW = X.T.dot(m_s)
+  dW /= num_train
+  dW += reg*W 
+
   pass
   #############################################################################
   #                          END OF YOUR CODE                                 #
