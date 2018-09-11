@@ -56,7 +56,7 @@ def svm_loss_naive(W, X, y, reg):
   #############################################################################
 
   dW /= num_train
-  dW += reg*W 
+  dW += 2*reg*W 
 
   return loss, dW
 
@@ -105,7 +105,7 @@ def svm_loss_vectorized(W, X, y, reg):
   mask[np.arange(len(y)), y] = - d_count
   dW = X.T.dot(mask)
   dW /= X.shape[0]
-  dW += reg*W 
+  dW += 2*reg*W 
 
   pass
   #############################################################################
